@@ -1,9 +1,9 @@
 <template>
-  <div class="xtx-carousel">
+  <div class="xtx-carousel" @mouseenter="stop" @mouseleave="start">
     <ul class="carousel-body">
       <li
         class="carousel-item"
-        :class="{fade:i === index}"
+        :class="{ fade: i === index }"
         v-for="(item, i) in list"
         :key="item.id"
       >
@@ -12,10 +12,10 @@
         </RouterLink>
       </li>
     </ul>
-    <a href="javascript:;" class="carousel-btn prev"
+    <a href="javascript:;" class="carousel-btn prev" @click.prevent="toggle(-1)"
       ><i class="iconfont icon-angle-left"></i
     ></a>
-    <a href="javascript:;" class="carousel-btn next"
+    <a href="javascript:;" class="carousel-btn next" @click.prevent="toggle(1)"
       ><i class="iconfont icon-angle-right"></i
     ></a>
     <div class="carousel-indicator">
@@ -25,7 +25,8 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import { getNewGoods } from "../api";
 export default {
   name: "XtxCarousel",
   props: {
@@ -37,19 +38,49 @@ export default {
   setup(props) {
     //自动轮播
     let index = ref(0); //轮播索引
-    let timer=null
+    let timer = null;
     function autoplay() {
+      clearInterval(timer);
       timer = setInterval(() => {
         index.value++;
-        if(index.value>=props.list.length){
-            index.value=0
+        if (index.value >= props.list.length) {
+          index.value = 0;
         }
       }, 2000);
     }
-    autoplay()
-    return{
-       index, 
+    autoplay();
+    //鼠标移入，停止轮播
+    function stop() {
+      if (timer) {
+        clearInterval(timer);
+      }
     }
+    //鼠标离开，开始轮播
+    function start() {
+      if (props.list.length > 0) {
+        autoplay();
+      }
+    }
+    //轮播的翻页
+    function toggle(step) {
+      let newindex = index.value + step;
+      //判断是否超过长度
+      if (newindex >= props.list.length) {
+        index.value = 0;
+        return;
+      }
+      if (newindex < 0) {
+        index.value = props.list.length - 1;
+        return;
+      }
+      index.value = newindex;
+    }
+    return {
+      index,
+      start,
+      stop,
+      toggle,
+    };
   },
 };
 </script>

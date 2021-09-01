@@ -46,11 +46,11 @@ export default {
     onMounted(async () => {
       let newGoodList = await getNewGoods();
       state.newlist = newGoodList.data.result;
-      console.log(state.newlist);
+    //   console.log(state.newlist);
 
       let banners=await getBanners()
       state.banners=banners.data.result
-      console.log( state.banners);
+     // console.log( state.banners);
     });
     return {
       state,
